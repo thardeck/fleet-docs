@@ -1,0 +1,35 @@
+---
+    name: "Update API docs"
+    
+    on:
+      workflow_dispatch:
+      schedule:
+        - cron: "0 0 * * 0"
+    
+    permissions:
+      contents: write
+      pull-requests: write
+
+    jobs:
+      updateapi:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout rancher/fleet-docs
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+              path: fleet-docs
+          - name: Checkout rancher/fleet
+            uses: actions/checkout@v4
+            with:
+              repository: rancher/fleet
+              path: fleet
+          - name: Update API docs
+            run: ./.github/scripts/update-api.sh
+          - name: Create Pull Request
+            uses: peter-evans/create-pull-request@v4
+            with:
+                commit-message: "Update API docs"
+                branch: update-api-branch
+                title: "Update API docs"
+                body: "Automated update of the API docs."
